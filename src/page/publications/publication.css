@@ -1,0 +1,444 @@
+.PublicationHome{
+    width:100%;
+    height: 100vh;
+    cursor: default;
+    scrollbar-width: thin;
+    scrollbar-color: gainsboro white;
+    overflow-y: scroll;
+}
+.PublicationHome::-webkit-scrollbar{
+    width: 5px;
+}
+.PublicationTitle{
+    width: 70%;
+    margin: 15px auto;
+    padding:5px 15px;
+    background-color:rgba(220, 220, 220, 0.5);
+    border: none;
+    border-radius: 15px;
+}
+.PublicationTitle-Img img{
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: scale-down;
+}
+.PublicationTitle-Img{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid black;
+}
+.PublicationTitle-Img p{
+   font-weight: bold;
+}
+.PublicationTitle-Selection{
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin: 10px 0 5px 0;
+}
+.CreatePublication,.CreateGroupe{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background-color: gainsboro;
+    border-radius: 20px;
+    padding:5px 20px;
+}
+.CreatePublication:hover,.CreateGroupe:hover{
+   background-color: blue;
+   color: white;
+   cursor: pointer;
+}
+.CreatePublication p,.CreateGroupe p{
+   margin: 0;
+   font-size: 12px;
+}
+/* publication header*/
+.ListPublicationPost p{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-weight: bold;
+    font-size: 12px;
+}
+.ListPublicationPost p:hover{
+    cursor: pointer;
+    color: gainsboro;
+}
+.PublicationShow{
+    width: 70%;
+    margin: 15px auto;
+    padding: 15px;
+    background-color:rgba(220, 220, 220, 1) ;
+    border: none;
+    border-radius: 15px;   
+}
+.PublicationPost-Menu{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.PublicationPost-Menu img{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: scale-down;
+}
+.PublicationPost-Menu-Icon{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+.ListPublicationPost{
+    background-color: hsl(0, 2%, 48%);
+    padding: 0 10px;
+    border-radius: 15px;
+    position: absolute;
+    width: 180px;
+    top: 25px; 
+    transition: all 0.5s ease-in-out; 
+}
+.PublicationPost-Menu img{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: scale-down;
+}
+.HeaderPublication p{
+text-align: justify;
+font-family: "Roboto";
+font-size: 14px;
+}
+.HeaderPublication P::first-letter{
+   margin-left: 10px;
+}
+.HeaderPublication span{
+font-size: 15px;
+margin-left: 2px;
+cursor: pointer;
+}
+/*affichage de la publication*/
+.HealthPublication{
+    border:1px solid black;
+    height: 500px;
+}
+.HealthPublication img{
+    width: 100%;
+    height: 100%;
+    object-fit: scale-down;
+}
+.LikingUp{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.LikingUp p:first-child{
+   display: flex;
+   align-items: flex-end;
+   gap: 5px;
+   font-weight: bold;
+}
+#like{
+    height: 30px;
+    width:30px;
+    color: blue;
+}
+.LikingDown{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+.LikingDown p{
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    border-radius: 15px;
+    background-color: gainsboro;
+    padding: 10px 30px;
+    border: 1px solid gainsboro;
+    font-size: 12px;
+}
+.LikingDown p:hover{
+    cursor: pointer;
+    border: 1px solid blue;
+    background-color: blue;
+    color: white;
+}
+#likes{
+    width: 20px;
+    height: 20px;
+}
+/*COMMENTAIRE*/
+.WrittingPrincipalComment form{
+    display: flex;
+    flex-direction: column;
+}
+.WrittingPrincipalComment textarea{
+    width: 98%;
+    padding: 0px 1%;
+    resize: none;
+    height: 80px;
+    overflow-y: auto;
+    outline: none;
+    font-family: "Roboto";
+}
+.OptionComment{
+    width:calc(100% - 19px);
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: gainsboro; 
+}
+.OptionComment p{
+    display: flex;
+    gap: 10px;
+    margin: 0;
+}
+.OptionComment button{
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 0;
+}
+.OptionComment button:hover{
+   color: blue;
+}
+.OptionComment p span:first-child{
+    color: red;
+}
+.OptionComment p span:last-child{
+    color: yellow;
+    position: relative;
+}
+#emoji{
+    position: absolute;
+    transform: translate(-50% , -100%);
+    left: 50%;
+    top: -80px;
+}
+
+/*SMS*/
+#textPriorirySms{
+    text-align: justify;
+    width: 90%;
+    padding:10px 15px ;
+    border-radius: 10px;
+    border: 2px solid black;
+    word-break:break-all ;
+}
+.PrioritySms{
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    background-color: white;
+    justify-content: space-between;
+}
+.PrioritySms .SmsLike span{
+    display: flex;
+    align-items: center;
+    padding-top: 15px;
+    gap: 1px;
+}
+.SmsOptionLiking{
+    width: calc(90% + 34px);
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.SmsOptionLiking p{
+    display: flex;
+    margin: 0;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 5px;
+    border-radius: 15px;
+    background-color: gainsboro;
+    padding: 5px 15px;
+    border: 1px solid gainsboro;
+    font-size: 10px;
+}
+.SmsOptionLiking p:hover{
+    cursor: pointer;
+    border: 1px solid blue;
+    background-color: blue;
+    color: white;
+}
+#textPriorirySms span{
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: capitalize;
+}
+#textPriorirySms span img{
+    width: 30px;
+    height: 30px;
+    object-fit: scale-down;
+    border-radius: 50%;
+}
+#textPriorirySms span label{
+   font-weight: normal;
+   color: green;
+   font-size: small;
+   padding-bottom: 1px;
+}
+
+/*secondary*/
+.SecondarySms #textPriorirySms{
+    text-align: justify;
+    width: 70%;
+    padding:10px 15px ;
+    border-radius: 10px;
+    border: 2px solid black;
+    word-break:break-all ;
+    margin-left: 20%;
+}
+.SecondarySms{
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+.SecondarySms .SmsLike span{
+    display: flex;
+    align-items: center;
+    padding-top: 15px;
+    gap: 1px;
+}
+.SecondarySms .SmsOptionLiking{
+    width: calc(70% + 34px);
+    margin-left:20% ;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.SecondarySms .SmsOptionLiking p{
+    display: flex;
+    margin: 0;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 5px;
+    border-radius: 15px;
+    background-color: gainsboro;
+    padding: 5px 15px;
+    border: 1px solid gainsboro;
+    font-size: 10px;
+}
+.SecondarySms .SmsOptionLiking p:hover{
+    cursor: pointer;
+    border: 1px solid blue;
+    background-color: blue;
+    color: white;
+}
+.SecondarySms #textPriorirySms span{
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: capitalize;
+}
+.SecondarySms #textPriorirySms span img{
+    width: 30px;
+    height: 30px;
+    object-fit: scale-down;
+    border-radius: 50%;
+}
+.SecondarySms #textPriorirySms span label{
+   font-weight: normal;
+   color: green;
+   font-size: small;
+   padding-bottom: 1px;
+}
+/*third*/
+.ThirdSms #textPriorirySms{
+    text-align: justify;
+    min-width:  70%;
+    padding:10px 15px ;
+    border-radius: 10px;
+    border: 2px solid black;
+    margin-left: 30%;
+    word-break:break-all ;
+    
+}  
+.ThirdSms{
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    background-color: white;
+    justify-content: space-between;
+}
+.ThirdSms .SmsLike span{
+    display: flex;
+    align-items: center;
+    padding-top: 15px;
+    gap: 1px;
+}
+.ThirdSms .SmsOptionLiking{
+    width: calc(70% + 34px);
+    margin-left:30% ;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.ThirdSms .SmsOptionLiking p{
+    display: flex;
+    margin: 0;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 5px;
+    border-radius: 15px;
+    background-color: gainsboro;
+    padding: 5px 15px;
+    border: 1px solid gainsboro;
+    font-size: 10px;
+}
+.ThirdSms .SmsOptionLiking p:hover{
+    cursor: pointer;
+    border: 1px solid blue;
+    background-color: blue;
+    color: white;
+}
+.ThirdSms #textPriorirySms span{
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: capitalize;
+}
+.ThirdSms #textPriorirySms span img{
+    width: 30px;
+    height: 30px;
+    object-fit: scale-down;
+    border-radius: 50%;
+}
+.ThirdSms #textPriorirySms span label{
+   font-weight: normal;
+   color: green;
+   font-size: small;
+   padding-bottom: 1px;
+}
+
+.CommentArea{
+    background-color: white;
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+#photoCommentaire{
+display: flex;
+margin-left: 50%;
+transform: translateX(-50%);
+
+}

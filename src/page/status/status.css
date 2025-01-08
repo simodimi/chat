@@ -1,0 +1,151 @@
+.StatusHome{
+    display:flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    height: 100vh;  
+}
+.StatusHomeLeft{
+    width: 30%;
+    border-right: 1px solid black;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: gainsboro white;
+}
+.StatusHomeRight{
+    width: 70%;
+    height: 100vh; 
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+.StatusContact{
+    display: flex;
+    align-items: center;   
+    gap: 20px;
+    padding-left: 15px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    padding:10px;
+    border-radius: 20px;
+    background-color:rgba(220, 220, 220, 0.5);
+}
+.StatusContact:hover{
+  background-color: rgba(220, 220, 220, 1);
+}
+.StatusName p{
+    margin: 0;
+    font-size: 12px;
+}
+.StatusName p:nth-child(1){
+    font-weight: 700;
+}
+.StatusContactImg img{
+   margin-top: 5px;
+    width:40px;
+    height:40px;
+    border-radius: 50%;
+    object-fit: cover;
+}  
+.StatusSelect{
+    background-color:green!important;
+    color: white;
+} 
+.StatusContactImg{
+    position: relative;
+}
+.StatusContactImg h2{
+    position: absolute;
+    content: "";
+    border-radius: 50%;
+    border: 3px solid green;   
+    width: 40px;
+    height: 40px;
+    left: 50%;
+    top: 2px;
+    transform: translateX(-50%);
+    margin: 0; 
+}
+.StatutOwn span{
+        display:flex;
+        margin-left:50%;
+        transform: translateX(-50%);
+        width: fit-content;
+}
+.CreateStatus{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 80%;
+    height: 80%;
+    border: 1px solid black;
+}
+.WriteSmsCall{
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+}
+.WriteSmsCall textarea{
+    width: calc(90% - 20px);
+    padding: 5px 10px;
+    height:80px ;
+    resize: none;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: gainsboro white;   
+}
+.WriteSmsCall span{
+    width:10% ;
+}
+.ReadAudio{
+    position: absolute;
+    bottom: 0;
+    margin-left: 50%;
+    transform: translateX(-50%);
+   
+}
+.ReadAudio p:nth-child(1){
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.ReadAudio p:nth-child(1) span:nth-child(2),.ReadAudio p:nth-child(1) span:nth-child(1){
+ 
+    width: fit-content;
+    height: fit-content;
+}
+
+.ReadAudio p:nth-child(1) span:nth-child(2){
+min-width: 150px;
+height: 50px;
+ }
+.ReadAudio p:nth-child(1) span:nth-child(3),.ReadAudio p:nth-child(1) span:nth-child(4){
+   width: fit-content;
+   height: fit-content;
+}
+.ReadAudio .CallOption {
+    background-color: transparent;
+}
+.ReadAudio .CallOption p:nth-child(2) span{
+   color: red;
+}
+.CallHomeTextStyle .CallOption{
+    position: absolute;
+    gap: 20px;
+    right: 5px;
+    display: flex;
+    flex-direction: column;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+    z-index: 800;
+}
+.CallHomeTextStyle .CallOption p{
+ margin: 0;
+}
