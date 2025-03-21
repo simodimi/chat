@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./publication.css";
 import { IoSend } from "react-icons/io5";
 import noname from "../../assets/icone/personne.jpeg";
@@ -14,123 +14,239 @@ import { FaRegMessage } from "react-icons/fa6";
 import { IoMdPhotos } from "react-icons/io";
 import { MdEmojiEmotions } from "react-icons/md";
 import Emoji from "../../component/Emoji";
+import Publier from "./Publier";
+import { Dialog, DialogContent, IconButton } from "@mui/material";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaMusic } from "react-icons/fa";
+import { use } from "react";
 
 const Publication = () => {
-  //changement de photo de profil
+  // États pour les publications
+  const [publications, setPublications] = useState([]);
+  const [selectedPublication, setSelectedPublication] = useState(null);
+  const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const [currentPublication, setCurrentPublication] = useState(null);
+
+  // États pour les commentaires et likes
+  const [comments, setComments] = useState({});
+  const [likes, setLikes] = useState({});
+  const [menuStates, setMenuStates] = useState({});
+  const [writeStates, setWriteStates] = useState({});
+  const [writeAreas, setWriteAreas] = useState({}); // État pour le texte de chaque publication
+  const [photoComment, setphotoComment] = useState(null);
+  const [emojis, setEmoji] = useState({});
+
   const ref = useRef(null);
+  const refcomment = useRef(null);
   const [ProfilePicture, setProfilePicture] = useState(noname);
+
+  // Gestion de la publication
+  const handlePublish = (publication) => {
+    setPublications((prev) => [publication, ...prev]); //ajouter la publication au début de la liste
+  };
+
+  // Gestion de la visionneuse de médias
+  const openMediaViewer = (publication, index) => {
+    setSelectedPublication(publication);
+    setCurrentMediaIndex(index);
+    setMediaViewerOpen(true);
+  };
+
+  const nextMedia = () => {
+    if (selectedPublication) {
+      setCurrentMediaIndex(
+        (prev) => (prev + 1) % selectedPublication.media.length
+      );
+    }
+  };
+
+  const prevMedia = () => {
+    if (selectedPublication) {
+      setCurrentMediaIndex(
+        (prev) =>
+          (prev - 1 + selectedPublication.media.length) %
+          selectedPublication.media.length
+      );
+    }
+  };
+
+  // Fonctions existantes
   const ChangeProfile = () => {
     ref.current.click();
   };
+
   const HandleProfile = (e) => {
-    const file = e.target.files[0]; //selection d'un seul fichier
+    const file = e.target.files[0];
     if (file) {
-      //si le fichier existe
       if (file.size <= 1 * 1024 * 1024) {
-        //si la taille du fichier est inferieur a 1mo
-        const dimi = new FileReader(); //lecture du fichier
+        const dimi = new FileReader();
         dimi.onloadend = () => {
-          // quand la lecture est terminée
-          setProfilePicture(dimi.result); //mettre le resultat de la lecture dans la variable ProfilePicture
+          setProfilePicture(dimi.result);
         };
-        dimi.readAsDataURL(file); // mis sous forme d'url
+        dimi.readAsDataURL(file);
       } else {
         alert("veillez choissir un fichier de moins de 5mo");
       }
     }
   };
 
-  //compteur de sms et affichage
-  const [SmsCompteur, setSmsCompteur] = useState(0);
-  const [seeComment, setseeComment] = useState(false);
+  // Gestion des likes
+  const handleLike = (publicationId, commentId = null) => {
+    if (commentId) {
+      // Like d'un commentaire
+      setComments((prev) => {
+        const updatedComments = { ...prev };
+        const updateComment = (commentsArray) => {
+          return commentsArray.map((comment) => {
+            if (comment.id === commentId) {
+              return {
+                ...comment,
+                likes: (comment.likes || 0) + (comment.isLiked ? -1 : 1),
+                isLiked: !comment.isLiked,
+              };
+            }
+            if (comment.replies) {
+              return {
+                ...comment,
+                replies: updateComment(comment.replies),
+              };
+            }
+            return comment;
+          });
+        };
 
-  //like publication
-  //liking
-  const [like, setlike] = useState(0);
-  const [isliking, setisliking] = useState(false);
-  const [seelike, setseelike] = useState(false);
-  const Liking = () => {
-    setlike(isliking ? like - 1 : like + 1);
-    setisliking((prev) => !prev);
-    setseelike((prev) => !prev);
+        if (updatedComments[publicationId]) {
+          updatedComments[publicationId] = updateComment(
+            updatedComments[publicationId]
+          );
+        }
+        return updatedComments;
+      });
+    } else {
+      // Like d'une publication
+      setLikes((prev) => ({
+        ...prev,
+        [publicationId]: {
+          count:
+            (prev[publicationId]?.count || 0) +
+            (prev[publicationId]?.isLiked ? -1 : 1),
+          isLiked: !prev[publicationId]?.isLiked,
+        },
+      }));
+    }
   };
 
-  //voir le menu liste de publication
-  //pubication
-  const [menulist, setmenulist] = useState(false);
-  const ShowMenu = () => {
-    setmenulist((prev) => !prev);
-  };
-
-  //affichage commentaire
-  const [replyToId, setreplyToId] = useState(null); //id du commentaire principal auquel on repond
-  const [Comment1, setComment1] = useState(false); //affichage
-  const [Comment2, setComment2] = useState(false);
-  const [Comment3, setComment3] = useState(false);
-  const [Comment1like, setComment1like] = useState({}); //compteur 1 like
-  const [isComment1like, setisComment1like] = useState({}); //verifions si le like 1 est deja fait
-  const [Comment2like, setComment2like] = useState({}); //compteur 1 like
-  const [isComment2like, setisComment2like] = useState({}); //verification
-  const [Comment3like, setComment3like] = useState({});
-  const [isComment3like, setisComment3like] = useState({});
-  const [texte1, settexte1] = useState([]); //
-  const [texte2, settexte2] = useState([]);
-  const [texte3, settexte3] = useState([]);
-
-  //comptage des likes des commentaires
-  //principal
-  const likingComment1 = (id) => {
-    setComment1like((prev) => ({
+  // Gestion du texte des commentaires
+  const handleWriteAreaChange = (publicationId, value) => {
+    setWriteAreas((prev) => ({
       ...prev,
-      [id]: isComment1like[id] ? (prev[id] || 0) - 1 : (prev[id] || 0) + 1,
+      [publicationId]: value,
     }));
-    setisComment1like((prev) => ({ ...prev, [id]: !prev[id] }));
   };
-  //secondaire
-  const likingComment2 = (id) => {
-    setComment2like((prev) => ({
-      ...prev, //faire une copie de l'objet texte2
-      //id: Met à jour uniquement la clé correspondant à l'ID du commentaire qui a été aimé ou non.
-      [id]: isComment2like[id] ? (prev[id] || 0) - 1 : (prev[id] || 0) + 1, //si le like est deja fait, on enleve 1, sinon on ajoute 1
-    }));
-    setisComment2like((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-  //tertiaire
-  const likingComment3 = (ids) => {
-    setComment3like((prev) => ({
+
+  // Ajout d'un commentaire
+  const addComment = (publicationId, parentCommentId = null) => {
+    const text = writeAreas[publicationId];
+    if (!text?.trim()) return;
+
+    const newComment = {
+      id: Date.now().toString(),
+      text: text.trim(),
+      author: "Dimitri",
+      authorPicture: ProfilePicture,
+      timestamp: new Date().toISOString(),
+      likes: 0,
+      isLiked: false,
+      photo: photoComment,
+      replies: [],
+    };
+
+    setComments((prev) => {
+      const publicationComments = prev[publicationId] || [];
+
+      if (parentCommentId) {
+        // Ajouter une réponse à un commentaire existant
+        const updateReplies = (comments) => {
+          return comments.map((comment) => {
+            if (comment.id === parentCommentId) {
+              return {
+                ...comment,
+                replies: [...(comment.replies || []), newComment],
+              };
+            }
+            if (comment.replies) {
+              return {
+                ...comment,
+                replies: updateReplies(comment.replies),
+              };
+            }
+            return comment;
+          });
+        };
+
+        return {
+          ...prev,
+          [publicationId]: updateReplies(publicationComments),
+        };
+      } else {
+        // Ajouter un nouveau commentaire principal
+        return {
+          ...prev,
+          [publicationId]: [...publicationComments, newComment],
+        };
+      }
+    });
+
+    // Réinitialiser uniquement la zone de texte de cette publication
+    setWriteAreas((prev) => ({
       ...prev,
-      [ids]: isComment3like[ids] ? (prev[ids] || 0) - 1 : (prev[ids] || 0) + 1,
+      [publicationId]: "",
     }));
-    setisComment3like((prev) => ({ ...prev, [ids]: !prev[ids] }));
-    alert("ok");
+    setphotoComment(null);
+    setWriteStates((prev) => ({
+      ...prev,
+      [publicationId]: false,
+    }));
   };
 
-  //voir saisir du texte et executer le texte
-
-  const [write, setwrite] = useState(false);
-  const ShowComment = () => {
-    setwrite((prev) => !prev);
-  };
-  const [writearea, setwritearea] = useState("");
-  const handlearea = (e) => {
-    setwritearea(e.target.value);
+  // Gestion du menu pour chaque publication
+  const toggleMenu = (publicationId) => {
+    setMenuStates((prev) => ({
+      ...prev,
+      [publicationId]: !prev[publicationId],
+    }));
   };
 
-  //ajouter des emoji
-  const handleEmojiClick = (e) => {
-    setwritearea((prev) => prev + e.emoji);
-  };
-  const [emojis, setEmoji] = useState(false);
-  const showEmoji = () => {
-    setEmoji((prev) => !prev);
+  // Gestion de l'écriture de commentaire pour chaque publication
+  const toggleWrite = (publicationId) => {
+    setWriteStates((prev) => ({
+      ...prev,
+      [publicationId]: !prev[publicationId],
+    }));
+    setCurrentPublication(publicationId);
   };
 
-  //selection images pour commentaire
-  const [photoComment, setphotoComment] = useState(null);
-  const refcomment = useRef(null);
+  // Gestion des emojis pour chaque publication
+  const toggleEmoji = (publicationId) => {
+    setEmoji((prev) => ({
+      ...prev,
+      [publicationId]: !prev[publicationId],
+    }));
+  };
+
+  // Gestion des emojis
+  const handleEmojiClick = (emoji, publicationId) => {
+    setWriteAreas((prev) => ({
+      ...prev,
+      [publicationId]: (prev[publicationId] || "") + emoji.emoji,
+    }));
+  };
+
   const showImage = () => {
     refcomment.current.click();
   };
+
   const handleCommentPicture = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -140,77 +256,17 @@ const Publication = () => {
           setphotoComment(dimi.result);
         };
         dimi.readAsDataURL(file);
-        setwritearea((prev) => prev + file.name); //affichage du nom de l'image dans le setter writearea
+        setWriteAreas((prev) => ({
+          ...prev,
+          [currentPublication]: prev[currentPublication] + file.name,
+        }));
       }
     }
   };
 
-  //repondre au commentaire principale
-  const ResComment1 = (id) => {
-    setwrite(true);
-    setreplyToId(id); //  //stockons l'id du commentaire principal auquel on répond
-  };
-  //répondre au commentaire secondaire
+  const maxlength = 600;
+  const [isexpand, setisexpand] = useState({});
 
-  const ResComment2 = (id) => {
-    setwrite(true);
-    setreplyToId(id); //stockons l'id du commentaire secondaire auquel on répond
-  };
-  //ajouter texte principale et secondaire
-  const addText = () => {
-    if (writearea.trim() !== "") {
-      // // Vérifie que le champ de texte n'est pas vide après suppression des espaces inutiles.
-      if (replyToId !== null) {
-        // Vérifie si l'utilisateur répond à un commentaire spécifique
-        if (typeof replyToId === "string" && replyToId.includes("-")) {
-          // Vérifie si `replyToId` est au format d'une réponse tertiaire (parentId-replyId).
-          const [parentId, replyId] = replyToId.split("-"); // // Sépare `replyToId` pour obtenir l'ID parent et l'ID de la réponse.
-          if (replyId) {
-            // Si `replyId` existe, il s'agit d'un commentaire tertiaire.
-
-            settexte3((prev) => ({
-              ...prev,
-              [replyToId]: [
-                ...(prev[replyToId] || []), // Copie les réponses existantes à ce commentaire tertiaire.
-                { text: writearea.trim(), photo: photoComment }, // Ajoute la nouvelle réponse avec le texte et la photo (si disponible).
-              ],
-            }));
-            setComment3(true); // Mettre à jour `Comment3` pour afficher le commentaire tertiaire.
-          } else {
-            // Si `replyId` n'existe pas, il s'agit d'un commentaire secondaire
-            settexte2((prev) => ({
-              ...prev, //faire une copie de l'objet texte2
-              [parentId]: [
-                //ajouter le commentaire secondaire au tableau correspondant pour une key identique au parentId
-                ...(prev[parentId] || []), //si des commentaires secondaires existent, on les copie ou liste vide par défaut
-                { text: writearea.trim(), photo: photoComment }, //ajouter le nouveau commentaire secondaire
-              ],
-            }));
-          }
-        } else {
-          // Si `replyToId` ne contient pas "-", on suppose qu'il s'agit d'une réponse secondaire.
-          settexte2((prev) => ({
-            ...prev,
-            [replyToId]: [
-              ...(prev[replyToId] || []),
-              { text: writearea.trim(), photo: photoComment },
-            ],
-          }));
-        }
-        setComment2(true); // Mettre à jour `Comment2` pour afficher le commentaire secondaire.
-      } else {
-        // Si `replyToId` est null, cela signifie qu'il s'agit d'un commentaire principal
-        setComment1(true); // Mettre à jour `Comment1` pour afficher le commentaire principal.
-        settexte1([...texte1, { text: writearea.trim(), photo: photoComment }]);
-      }
-      setwritearea(""); // Vider le champ de texte
-      setSmsCompteur(SmsCompteur + 1); // Ajouter 1 au compteur de SMS
-      setseeComment(true); // Mettre à jour `seeComment` pour afficher les commentaires
-      setphotoComment(null); // Vider la photo de commentaire
-      setwrite(false); // Mettre à jour `write` pour fermer la publication
-      setreplyToId(null); //Réinitialise l'ID de réponse pour un commentaire.
-    }
-  };
   return (
     <div className="PublicationHome">
       <div className="PublicationTitle">
@@ -228,12 +284,7 @@ const Publication = () => {
           <p>Dimitri</p>
         </div>
         <div className="PublicationTitle-Selection">
-          <div className="CreatePublication">
-            <p>Créer une publication</p>
-            <span>
-              <FaPenAlt />
-            </span>
-          </div>
+          <Publier onPublish={handlePublish} />
           <div className="CreateGroupe">
             <p>Créer un groupe</p>
             <span>
@@ -242,292 +293,351 @@ const Publication = () => {
           </div>
         </div>
       </div>
+
       <div className="PublicationShow">
-        <div className="PublicationPost">
-          <div className="PublicationPost-Menu">
-            <p
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "15px",
-                fontWeight: "bold",
-              }}
-            >
-              <img src={ProfilePicture} alt="" /> Dimitri
-            </p>
-            <div className="PublicationPost-Menu-Icon">
-              <span>
-                <MdMenu
-                  onClick={() => ShowMenu()}
-                  style={{ cursor: "pointer" }}
-                  className="ButtonMenu"
-                />
-              </span>
-              {menulist && (
-                <div className="ListPublicationPost">
-                  <p>
-                    <CiSaveDown2 />
-                    <span>Enregistrer la publication</span>
-                  </p>
-                  <p>
-                    <FaMasksTheater />
-                    <span>masquer la publication</span>
-                  </p>
-                  <p>
-                    <MdAppBlocking />
-                    <span>Bloquer le profil de Dimitri</span>
-                  </p>
-                  <p>
-                    <SiAdblock />
-                    <span>signaler la publication</span>
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="TextePublication">
-            <div className="HeaderPublication">
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum
-                quod eveniet eius illo corporis ex a sit minus at debitis
-                necessitatibus temporibus nisi veniam libero voluptates
-                expedita, maiores nobis magni. Lorem ipsum dolor sit amet
-                consectetur adipisicing elit. Laborum neque illum obcaecati
-                minima, rerum sit. Repellendus repudiandae veniam dicta qui ab,
-                quaerat impedit consequatur eaque, doloribus ducimus facere
-                accusantium nihil!
-                <span>...</span>
+        {publications.map((publication, index) => (
+          <div key={publication.id || index} className="PublicationPost">
+            <div className="PublicationPost-Menu">
+              <p
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "15px",
+                  fontWeight: "bold",
+                }}
+              >
+                <img src={ProfilePicture} alt="" /> Dimitri
               </p>
+              <div className="PublicationPost-Menu-Icon">
+                <span>
+                  <MdMenu
+                    onClick={() => toggleMenu(publication.id)}
+                    style={{ cursor: "pointer" }}
+                    className="ButtonMenu"
+                  />
+                </span>
+                {menuStates[publication.id] && (
+                  <div className="ListPublicationPost">
+                    <p>
+                      <CiSaveDown2 />
+                      <span>Enregistrer la publication</span>
+                    </p>
+                    <p>
+                      <FaMasksTheater />
+                      <span>masquer la publication</span>
+                    </p>
+                    <p>
+                      <MdAppBlocking />
+                      <span>Bloquer le profil de Dimitri</span>
+                    </p>
+                    <p>
+                      <SiAdblock />
+                      <span>signaler la publication</span>
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="HealthPublication">
-              <img src={noname} alt="" />
-            </div>
-            <div className="LikingPublication">
-              <div className="LikingUp">
-                {seelike && (
+            <div className="TextePublication">
+              <div className="HeaderPublication">
+                <p>
+                  {publication.text.length > maxlength &&
+                  !isexpand[publication.id] //l'user n'a pas cliqué sur lire la suite affiche les 150 premiers caractères
+                    ? `${publication.text.slice(0, maxlength)}...`
+                    : publication.text}
+                </p>
+                {publication.text.length > maxlength && (
+                  <div className="HeaderPublication-Text">
+                    <span
+                      onClick={() =>
+                        setisexpand((prev) => ({
+                          ...prev,
+                          [publication.id]: !prev[publication.id],
+                        }))
+                      }
+                    >
+                      {isexpand[publication.id]
+                        ? "Lire moins..."
+                        : "Lire la suite..."}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="HealthPublication">
+                {publication.media.length > 0 && (
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        publication.media.length === 1
+                          ? "1fr"
+                          : "repeat(2, 1fr)",
+                      gap: "8px",
+                      height: "100%",
+                    }}
+                  >
+                    {publication.media.map((media, mediaIndex) => (
+                      <div
+                        key={mediaIndex}
+                        style={{
+                          gridColumn:
+                            publication.media.length === 1 ? "span 2" : "auto",
+                          cursor: "pointer",
+                          position: "relative",
+                          height: "100%",
+                        }}
+                        onClick={() => openMediaViewer(publication, mediaIndex)}
+                      >
+                        {media.type === "image" ? (
+                          <img
+                            src={media.url}
+                            alt=""
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        ) : (
+                          <video
+                            src={media.url}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                            muted
+                          />
+                        )}
+                        {publication.media.length > 2 && mediaIndex === 1 && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              transform: "translate(-50%, -50%)",
+                              backgroundColor: "rgba(0,0,0,0.6)",
+                              color: "white",
+                              padding: "8px 16px",
+                              borderRadius: "20px",
+                            }}
+                          >
+                            + {publication.media.length - 2}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {publication.audio.length > 0 && (
+                  <div style={{ padding: "16px" }}>
+                    {publication.audio.map((audio, audioIndex) => (
+                      <div
+                        key={audioIndex}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          padding: "8px",
+                          backgroundColor: "#f5f5f5",
+                          borderRadius: "8px",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        <FaMusic />
+                        <span>{audio.name}</span>
+                        <audio controls src={audio.url} style={{ flex: 1 }} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="LikingPublication">
+                <div className="LikingUp">
                   <p>
                     <AiTwotoneLike id="like" />
-                    <span>{like}</span>
+                    <span>{likes[publication.id]?.count || 0}</span>
                   </p>
-                )}
-                {seeComment && (
-                  <p style={{ fontWeight: "bold" }}>
-                    {SmsCompteur === 1
-                      ? `${SmsCompteur} commentaire`
-                      : `${SmsCompteur} commentaires`}
+                  <p>
+                    {comments[publication.id]?.length || 0} commentaire
+                    {comments[publication.id]?.length !== 1 ? "s" : ""}
                   </p>
-                )}
-              </div>
-              <div className="LikingDown">
-                <p onClick={() => Liking()}>
-                  <AiTwotoneLike id="likes" /> Like
-                </p>
-                <p onClick={() => ShowComment()}>
-                  <FaRegMessage id="likes" /> Commenter
-                </p>
+                </div>
+                <div className="LikingDown">
+                  <p onClick={() => handleLike(publication.id)}>
+                    <AiTwotoneLike id="likes" />
+                    Like
+                  </p>
+                  <p onClick={() => toggleWrite(publication.id)}>
+                    <FaRegMessage id="likes" /> Commenter
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="CommentArea">
-          {/*affichage des messages principaux */}
-
-          {Comment1 && (
-            <>
-              {texte1.map((p, id) => (
-                <div className="" key={id}>
-                  <div className="PrioritySms">
-                    <div className="SmsWrite">
-                      <p id="textPriorirySms">
-                        <span>
-                          <img src={noname} alt="" /> Dimitri <label>10h</label>
-                        </span>
-                        {p.text}
-
-                        {p.photo && (
-                          <img src={p.photo} alt="" id="photoCommentaire" />
-                        )}
-                      </p>
-                      <div className="SmsOptionLiking">
-                        <p onClick={() => likingComment1(id)}>
-                          <AiTwotoneLike id="likes" /> Like
-                        </p>
-                        <p onClick={() => ResComment1(id)}>
-                          <FaRegMessage id="likes" /> Répondre
-                        </p>
-                      </div>
-                    </div>
-                    <div className="SmsLike">
-                      {Comment1like[id] > 0 && (
-                        <span>
-                          {Comment1like[id]} <AiTwotoneLike id="likePriority" />{" "}
-                        </span>
+            {/* Zone de commentaires */}
+            <div className="CommentArea">
+              {comments[publication.id]?.map((comment) => (
+                <div key={comment.id} className="Comment">
+                  <div className="CommentContent">
+                    <img src={comment.authorPicture} alt="" />
+                    <div>
+                      <p className="CommentAuthor">{comment.author}</p>
+                      <p className="CommentText">{comment.text}</p>
+                      {comment.photo && (
+                        <img
+                          src={comment.photo}
+                          alt=""
+                          className="CommentPhoto"
+                        />
                       )}
                     </div>
                   </div>
-                  {/*Sous Commentaire */}
 
-                  {texte2[id] &&
-                    // Vérifie si le commentaire principal a des réponses dans texte2
-                    texte2[id].map((reply, replyId) => (
-                      // Parcourt toutes les réponses secondaires associées à ce commentaire principal.
-                      <div className="" key={`${id}-${replyId}`}>
-                        <div className="SecondarySms">
-                          <div className="SmsWrite">
-                            <p id="textPriorirySms">
-                              <span>
-                                <img src={noname} alt="" /> simo{" "}
-                                <label>10h</label>
-                              </span>
-                              {reply.text}{" "}
-                              {/* Affiche le texte de la réponse */}
+                  <div className="CommentActions">
+                    <p onClick={() => handleLike(publication.id, comment.id)}>
+                      <AiTwotoneLike /> Like{" "}
+                      {comment.likes > 0 && comment.likes}
+                    </p>
+                    <p onClick={() => toggleWrite(publication.id)}>
+                      <FaRegMessage /> Répondre
+                    </p>
+                  </div>
+
+                  {/* Réponses au commentaire */}
+                  {comment.replies?.length > 0 && (
+                    <div className="Replies">
+                      {comment.replies.map((reply) => (
+                        <div key={reply.id} className="Comment">
+                          <div className="CommentContent">
+                            <img src={reply.authorPicture} alt="" />
+                            <div>
+                              <p className="CommentAuthor">{reply.author}</p>
+                              <p className="CommentText">{reply.text}</p>
                               {reply.photo && (
                                 <img
                                   src={reply.photo}
                                   alt=""
-                                  id="photoCommentaire"
+                                  className="CommentPhoto"
                                 />
                               )}
-                              {/* Si une photo est jointe à la réponse, elle est affichée ici */}
-                            </p>
-                            <div className="SmsOptionLiking">
-                              <p
-                                onClick={
-                                  () => likingComment2(`${id}-${replyId}`) //Cette syntaxe crée un identifiant unique pour la réponse secondaire. Par exemple, si id = 1 et replyId = 2, l'ID final sera "1-2"
-                                }
-                              >
-                                <AiTwotoneLike id="likes" /> Like
-                              </p>
-                              <p
-                                onClick={() => ResComment2(`${id}-${replyId}`)}
-                              >
-                                <FaRegMessage id="likes" /> Répondre
-                              </p>
                             </div>
                           </div>
-                          <div className="SmsLike">
-                            {Comment2like[`${id}-${replyId}`] > 0 && (
-                              <span>
-                                {Comment2like[`${id}-${replyId}`]}{" "}
-                                <AiTwotoneLike id="likePriority" />{" "}
-                              </span>
-                            )}
+                          <div className="CommentActions">
+                            <p
+                              onClick={() =>
+                                handleLike(publication.id, reply.id)
+                              }
+                            >
+                              <AiTwotoneLike /> Like{" "}
+                              {reply.likes > 0 && reply.likes}
+                            </p>
                           </div>
                         </div>
-
-                        {texte3[`${id}-${replyId}`] &&
-                          texte3[`${id}-${replyId}`].map(
-                            (tertiaryreply, tertiaryreplyId) => (
-                              <div
-                                className="ThirdSms"
-                                key={`${id}-${replyId}-${tertiaryreplyId}`}
-                              >
-                                <div className="SmsWrite">
-                                  <p id="textPriorirySms">
-                                    <span>
-                                      <img src={noname} alt="" /> simo{" "}
-                                      <label>10h</label>
-                                    </span>
-                                    {tertiaryreply.text}
-
-                                    {tertiaryreply.photo && (
-                                      <img
-                                        src={tertiaryreply.photo}
-                                        alt=""
-                                        id="photoCommentaire"
-                                      />
-                                    )}
-                                  </p>
-                                  <div className="SmsOptionLiking">
-                                    <p
-                                      onClick={() =>
-                                        likingComment3(
-                                          `${id}-${replyId}-${tertiaryreplyId}`
-                                        )
-                                      }
-                                    >
-                                      <AiTwotoneLike id="likes" /> Like
-                                    </p>
-                                  </div>
-                                </div>
-                                <div className="SmsLike">
-                                  {Comment3like[
-                                    `${id}-${replyId} -${tertiaryreplyId}`
-                                  ] > 0 && (
-                                    <span>
-                                      {
-                                        Comment3like[
-                                          `${id}-${replyId}-${tertiaryreplyId}`
-                                        ]
-                                      }
-                                      <AiTwotoneLike id="likePriority" />{" "}
-                                    </span>
-                                  )}
-                                </div>
-                                {/*ouverture troiseme */}
-                              </div>
-                            )
-                          )}
-                        {/*ouverture deuxieme */}
-                      </div>
-                    ))}
-
-                  {/*ouverture first */}
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
-            </>
-          )}
-
-          {/*autres sous commentaire */}
-        </div>
-        {write && (
-          <div className="PublicationCommentaire">
-            <div className="WrittingPrincipalComment">
-              <form action="">
-                <textarea
-                  name=""
-                  id=""
-                  value={writearea}
-                  onChange={handlearea}
-                ></textarea>
-                <div className="OptionComment">
-                  <p>
-                    <span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        ref={refcomment}
-                        onChange={handleCommentPicture}
-                        style={{ display: "none" }}
-                      />
-                      <IoMdPhotos
-                        onClick={() => showImage()}
-                        className="ButtonMenu"
-                      />
-                    </span>
-                    <span>
-                      <MdEmojiEmotions
-                        onClick={() => showEmoji()}
-                        className="ButtonMenu"
-                      />
-                      {emojis && (
-                        <div className="" id="emoji">
-                          <Emoji handleEmojiClick={handleEmojiClick} />
-                        </div>
-                      )}
-                    </span>
-                  </p>
-                  <button type="button">
-                    <IoSend onClick={() => addText()} className="ButtonMenu" />
-                  </button>
-                </div>
-              </form>
             </div>
+
+            {/* Zone d'écriture des commentaires */}
+            {writeStates[publication.id] && (
+              <div className="PublicationCommentaire">
+                <div className="WrittingPrincipalComment">
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      addComment(publication.id);
+                    }}
+                  >
+                    <textarea
+                      value={writeAreas[publication.id] || ""}
+                      onChange={(e) =>
+                        handleWriteAreaChange(publication.id, e.target.value)
+                      }
+                      placeholder="Écrivez un commentaire..."
+                    />
+                    <div className="OptionComment">
+                      <p>
+                        <span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            ref={refcomment}
+                            onChange={handleCommentPicture}
+                            style={{ display: "none" }}
+                          />
+                          <IoMdPhotos
+                            onClick={showImage}
+                            className="ButtonMenu"
+                          />
+                        </span>
+                        <span>
+                          <MdEmojiEmotions
+                            onClick={() => toggleEmoji(publication.id)}
+                            className="ButtonMenu"
+                          />
+                          {emojis[publication.id] && (
+                            <div className="" id="emoji">
+                              <Emoji
+                                handleEmojiClick={(emoji) =>
+                                  handleEmojiClick(emoji, publication.id)
+                                }
+                              />
+                            </div>
+                          )}
+                        </span>
+                      </p>
+                      <button type="submit">
+                        <IoSend className="ButtonMenu" />
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        ))}
       </div>
+
+      {/* Visionneuse de médias */}
+      <Dialog
+        open={mediaViewerOpen}
+        onClose={() => setMediaViewerOpen(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogContent style={{ position: "relative", textAlign: "center" }}>
+          <IconButton
+            onClick={prevMedia}
+            style={{ position: "absolute", left: 10, top: "50%" }}
+          >
+            <FaChevronLeft />
+          </IconButton>
+          {selectedPublication?.media[currentMediaIndex]?.type === "image" ? (
+            <img
+              src={selectedPublication?.media[currentMediaIndex]?.url}
+              alt=""
+              style={{ maxWidth: "100%", maxHeight: "80vh" }}
+            />
+          ) : (
+            <video
+              src={selectedPublication?.media[currentMediaIndex]?.url}
+              controls
+              style={{ maxWidth: "100%", maxHeight: "80vh" }}
+            />
+          )}
+          <IconButton
+            onClick={nextMedia}
+            style={{ position: "absolute", right: 10, top: "50%" }}
+          >
+            <FaChevronRight />
+          </IconButton>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
 export default Publication;
