@@ -23,13 +23,14 @@ const Sms = ({
   // Effet pour ajouter un emoji sélectionné au texte
   useEffect(() => {
     if (selectedEmoji) {
-      if (isMobileEmojiMode) {
-        addMobileEmoji(selectedEmoji);
-      } else {
-        setValue((prevValue) => prevValue + selectedEmoji);
-      }
+      setValue((prevValue) => prevValue + selectedEmoji);
     }
-  }, [selectedEmoji, isMobileEmojiMode]);
+  }, [selectedEmoji]);
+  useEffect(() => {
+    if (isMobileEmojiMode) {
+      addMobileEmoji(selectedEmoji);
+    }
+  }, [isMobileEmojiMode]);
 
   // Fonction pour ajouter un emoji mobile
   const addMobileEmoji = (emoji) => {
@@ -67,7 +68,6 @@ const Sms = ({
             color: colorText,
             fontSize: taille,
             fontFamily: font,
-            padding: "0px 10px",
           }}
         >
           {value}
